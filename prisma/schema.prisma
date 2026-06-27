@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model MeterStockPool {
+  id     Int    @id @default(autoincrement())
+  /// Clave estable única por material (ej. MAL_FIBRA).
+  key    String @unique
+  meters Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
+}
+
+model Product {
+  /// Mantengo el ID explícito para que coincida con las URLs actuales (/productos/:id)
+  id              Int      @id
+  sku             String   @unique
+  name            String
+  description     String
+  category        String
+  price           Int
+  /// Lista mayorista (centavos/ARS entero, igual que `price`). Solo se cobra a usuarios mayoristas aprobados.
+  wholesalePrice  Int?
+  stock           Int
+  image           String?
+  isNew           Boolean  @default(false)
+  technicalSheet  String?
+  technicalSummary Json?
+  isActive        Boolean  @default(true)
+
+  /// Inventario compartido en metros (ej. rollo + x metro mismo material).
+  meterStockPoolId   Int?
+  /// Metros que descuenta cada unidad del carrito (rollo 50, x metro 1).
+  meterConsumePerQty Int?
+
+  meterStockPool MeterStockPool? @relation(fields: [meterStockPoolId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orderItems OrderItem[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String
+  role         UserRole @default(USER)
+
+  country      CountryCode?
+
+  customerType    CustomerType?
+  wholesaleStatus WholesaleStatus?
+  wholesaleTier   WholesaleTier?
+  wholesaleDiscountPercent Int?
+
+  phone    String?
+  cuit     String?
+  address  String?
+  city     String?
+  state    String?
+  zipCode  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
+}
+
+model WholesaleHistoricalCuit {
+  id              Int      @id @default(autoincrement())
+  /// CUIT normalizado: solo dígitos (ej: "20123456789")
+  cuit            String   @unique
+  discountPercent Int      @default(15)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  number         Int         @unique @default(autoincrement())
+  userId         String?
+  userEmail      String?
+  status         OrderStatus @default(PENDING)
+
+  total          Int
+  paymentMethod  PaymentMethod @default(MERCADOPAGO)
+  discountPercent Int @default(0)
+  discountAmount  Int @default(0)
+  shipping       Json?
+
+  mpPreferenceId String?
+  mpPaymentId    String?
+  mpStatus       String?
+  paidAt         DateTime?
+  confirmationEmailSentAt DateTime?
+  confirmationEmailSentTo String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items OrderItem[]
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  productId Int
+
+  name      String
+  unitPrice Int
+  quantity  Int
+  subtotal  Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum CountryCode {
+  AR
+  MX
+  CU
+}
+
+enum CustomerType {
+  RETAIL
+  WHOLESALE
+}
+
+enum WholesaleStatus {
+  PENDING
+  APPROVED
+}
+
+enum WholesaleTier {
+  NEW
+  HISTORICAL
+}
+
+enum PaymentMethod {
+  MERCADOPAGO
+  PAY_AT_FACTORY
+}
+
