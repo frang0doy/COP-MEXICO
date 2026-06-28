@@ -360,17 +360,16 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                     <div className={['h-1 w-28', theme.accent].join(' ')} />
                   </div>
                   <div className="p-5">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase">Infografía</p>
-                        <p className="text-lg font-semibold text-black mt-1">Datos clave del producto</p>
-                      </div>
-                      {technicalSummary.observaciones && (
-                        <span className="text-xs font-semibold text-black bg-gray-100 border border-gray-200 px-2 py-1 shrink-0">
-                          {technicalSummary.observaciones}
-                        </span>
-                      )}
+                    <div>
+                      <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase">Infografía</p>
+                      <p className="text-lg font-semibold text-black mt-1">Datos clave del producto</p>
                     </div>
+                    {technicalSummary.observaciones && (
+                      <div className="mt-4 border border-gray-200 bg-gray-50 p-4">
+                        <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase mb-2">Observaciones</p>
+                        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{technicalSummary.observaciones}</p>
+                      </div>
+                    )}
 
                     {technicalSummary.presentacion && (
                       <div className="mt-5 border border-gray-200 bg-gray-50 p-4">
@@ -411,7 +410,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                       {(variantLabels.length > 0 || technicalSummary.colores) && (
                         <div className="border border-gray-200 p-4">
                           <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase">Colores del producto</p>
-                          <p className="text-black mt-2 line-clamp-3">
+                          <p className="text-black mt-2">
                             {variantLabels.length > 0 ? formatSpanishList(variantLabels) : technicalSummary.colores}
                           </p>
                         </div>
@@ -419,7 +418,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                       {technicalSummary.usos && (
                         <div className="border border-gray-200 p-4 sm:col-span-2">
                           <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase">Usos</p>
-                          <p className="text-black mt-2 line-clamp-5">{technicalSummary.usos}</p>
+                          <p className="text-black mt-2 leading-relaxed">{technicalSummary.usos}</p>
                         </div>
                       )}
                     </div>
