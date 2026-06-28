@@ -19,6 +19,8 @@ type Product = {
   stock: number
 }
 
+type PendingChange = { isActive?: boolean; isNew?: boolean }
+
 type SortKey = 'id' | 'sku' | 'name' | 'category'
 type SortDir = 'asc' | 'desc'
 
@@ -46,6 +48,7 @@ export default function AdminProductosPage() {
   const [sortKey, setSortKey] = useState<SortKey>('id')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
   const [saving, setSaving] = useState<number | null>(null)
+  const [pending, setPending] = useState<Record<number, PendingChange>>({})
 
   useEffect(() => {
     if (status === 'loading') return
@@ -54,6 +57,7 @@ export default function AdminProductosPage() {
   }, [session, status])
 
   const load = () => {
+    setPending({})
     fetch('/api/admin/products', { cache: 'no-store' })
       .then(r => r.json()).then(d => { setProducts(d.products ?? []); setLoading(false) })
       .catch(() => { toast.error('Error al cargar productos'); setLoading(false) })
@@ -65,44 +69,50 @@ export default function AdminProductosPage() {
     let list = [...products]
     if (search) { const q = search.toLowerCase(); list = list.filter(p => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q) || String(p.id).includes(q) || p.category.toLowerCase().includes(q)) }
     if (filterCat) list = list.filter(p => p.category === filterCat)
-    if (filterState === 'active') list = list.filter(p => p.isActive !== false)
-    if (filterState === 'paused') list = list.filter(p => p.isActive === false)
-    if (filterNew === 'yes') list = list.filter(p => p.isNew)
-    if (filterNew === 'no') list = list.filter(p => !p.isNew)
+    const effectiveActive = (p: Product) => pending[p.id]?.isActive !== undefined ? pending[p.id].isActive : p.isActive
+    const effectiveNew = (p: Product) => pending[p.id]?.isNew !== undefined ? pending[p.id].isNew : p.isNew
+    if (filterState === 'active') list = list.filter(p => effectiveActive(p) !== false)
+    if (filterState === 'paused') list = list.filter(p => effectiveActive(p) === false)
+    if (filterNew === 'yes') list = list.filter(p => effectiveNew(p))
+    if (filterNew === 'no') list = list.filter(p => !effectiveNew(p))
     list.sort((a, b) => {
       const av = String((a as any)[sortKey] ?? ''), bv = String((b as any)[sortKey] ?? '')
       return sortDir === 'asc' ? av.localeCompare(bv, 'es', { numeric: true }) : bv.localeCompare(av, 'es', { numeric: true })
     })
     return list
-  }, [products, search, filterCat, filterState, filterNew, sortKey, sortDir])
+  }, [products, search, filterCat, filterState, filterNew, sortKey, sortDir, pending])
 
   const total = products.length
-  const pausados = products.filter(p => p.isActive === false).length
+  const pausados = products.filter(p => (pending[p.id]?.isActive !== undefined ? pending[p.id].isActive : p.isActive) === false).length
 
-  const togglePause = async (p: Product) => {
-    setSaving(p.id)
-    try {
-      const res = await fetch(`/api/admin/products/${p.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isActive: p.isActive !== false ? false : true }) })
-      const d = await res.json()
-      if (!res.ok) { toast.error(d.error || 'Error'); return }
-      setProducts(prev => prev.map(x => x.id === p.id ? { ...x, isActive: d.product.isActive } : x))
-      toast.success(d.product.isActive ? 'Producto activado' : 'Producto pausado')
-    } catch { toast.error('Error') } finally { setSaving(null) }
+  const togglePause = (p: Product) => {
+    const current = pending[p.id]?.isActive !== undefined ? pending[p.id].isActive : p.isActive
+    setPending(prev => ({ ...prev, [p.id]: { ...prev[p.id], isActive: current !== false ? false : true } }))
   }
 
-  const toggleNew = async (p: Product) => {
+  const toggleNew = (p: Product) => {
+    const current = pending[p.id]?.isNew !== undefined ? pending[p.id].isNew : p.isNew
+    setPending(prev => ({ ...prev, [p.id]: { ...prev[p.id], isNew: !current } }))
+  }
+
+  const saveProduct = async (p: Product) => {
+    const changes = pending[p.id]
+    if (!changes || Object.keys(changes).length === 0) { toast('Sin cambios para guardar'); return }
     setSaving(p.id)
     try {
-      const res = await fetch(`/api/admin/products/${p.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isNew: !p.isNew }) })
+      const res = await fetch(`/api/admin/products/${p.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(changes) })
       const d = await res.json()
       if (!res.ok) { toast.error(d.error || 'Error'); return }
-      setProducts(prev => prev.map(x => x.id === p.id ? { ...x, isNew: d.product.isNew } : x))
-      toast.success(d.product.isNew ? 'Marcado como nuevo' : 'Quitado de nuevos')
+      setProducts(prev => prev.map(x => x.id === p.id ? { ...x, ...d.product } : x))
+      setPending(prev => { const n = { ...prev }; delete n[p.id]; return n })
+      toast.success('Guardado')
     } catch { toast.error('Error') } finally { setSaving(null) }
   }
 
   if (status === 'loading' || isAdmin === null) return <main className="min-h-screen pt-24 bg-gray-100"><Navbar /><div className="max-w-7xl mx-auto px-4 py-12 text-center text-gray-500">Cargando...</div><Footer /></main>
   if (!session || isAdmin === false) return <main className="min-h-screen pt-24 bg-gray-100"><Navbar /><div className="max-w-7xl mx-auto px-4 py-12 text-center text-red-500 font-semibold">No autorizado</div><Footer /></main>
+
+  const hasPending = Object.keys(pending).length > 0
 
   return (
     <main className="min-h-screen pt-24 bg-gray-100">
@@ -114,9 +124,14 @@ export default function AdminProductosPage() {
             <h1 className="text-3xl font-bold text-black">Admin · Productos</h1>
             <p className="text-gray-500 mt-1">Pausá productos para que no aparezcan en el catálogo.</p>
           </div>
-          <div className="flex gap-3 flex-wrap">
+          <div className="flex gap-3 flex-wrap items-center">
             <div className="bg-white border border-gray-200 px-4 py-2 text-sm"><span className="text-gray-500">Total:</span> <span className="font-bold">{total}</span></div>
             <div className="bg-white border border-orange-200 px-4 py-2 text-sm"><span className="text-orange-600">Pausados:</span> <span className="font-bold text-orange-600">{pausados}</span></div>
+            {hasPending && (
+              <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold border border-yellow-300">
+                {Object.keys(pending).length} cambio{Object.keys(pending).length > 1 ? 's' : ''} sin guardar
+              </span>
+            )}
           </div>
         </div>
 
@@ -184,40 +199,53 @@ export default function AdminProductosPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filtered.map(p => (
-                    <tr key={p.id} className={`hover:bg-gray-50 transition-colors ${p.isActive === false ? 'opacity-60' : ''}`}>
-                      <td className="px-4 py-3 text-gray-400 text-xs">{p.id}</td>
-                      <td className="px-4 py-3 font-mono text-xs text-gray-600">{p.sku}</td>
-                      <td className="px-4 py-3 font-medium max-w-[220px]">
-                        <span className="line-clamp-2">{p.name}</span>
-                        <span className="block text-xs text-gray-400 mt-0.5">Catálogo: {p.name.split(' ')[0]}</span>
-                      </td>
-                      <td className="px-4 py-3 text-xs text-gray-500">{p.category.replace(/_/g, ' ')}</td>
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => toggleNew(p)}
-                          disabled={saving === p.id}
-                          className={`px-2 py-0.5 text-xs font-semibold transition-colors ${p.isNew ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
-                        >
-                          {p.isNew ? 'Sí' : 'No'}
-                        </button>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 text-xs font-semibold ${p.isActive !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                          {p.isActive !== false ? 'Activo' : 'Pausado'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => togglePause(p)}
-                          disabled={saving === p.id}
-                          className={`px-3 py-1 text-xs font-semibold border transition-colors disabled:opacity-50 ${p.isActive !== false ? 'border-red-200 text-red-600 hover:bg-red-50' : 'border-green-200 text-green-600 hover:bg-green-50'}`}
-                        >
-                          {saving === p.id ? '...' : p.isActive !== false ? 'Pausar' : 'Activar'}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {filtered.map(p => {
+                    const effectiveActive = pending[p.id]?.isActive !== undefined ? pending[p.id].isActive : p.isActive
+                    const effectiveNew = pending[p.id]?.isNew !== undefined ? pending[p.id].isNew : p.isNew
+                    const hasPendingRow = !!pending[p.id]
+                    return (
+                      <tr key={p.id} className={`hover:bg-gray-50 transition-colors ${effectiveActive === false ? 'opacity-60' : ''} ${hasPendingRow ? 'bg-yellow-50' : ''}`}>
+                        <td className="px-4 py-3 text-gray-400 text-xs">{p.id}</td>
+                        <td className="px-4 py-3 font-mono text-xs text-gray-600">{p.sku}</td>
+                        <td className="px-4 py-3 font-medium max-w-[220px]">
+                          <span className="line-clamp-2">{p.name}</span>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-500">{p.category.replace(/_/g, ' ')}</td>
+                        <td className="px-4 py-3">
+                          <button
+                            onClick={() => toggleNew(p)}
+                            disabled={saving === p.id}
+                            className={`px-2 py-0.5 text-xs font-semibold transition-colors ${effectiveNew ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                          >
+                            {effectiveNew ? 'Sí' : 'No'}
+                          </button>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`px-2 py-0.5 text-xs font-semibold ${effectiveActive !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {effectiveActive !== false ? 'Activo' : 'Pausado'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => togglePause(p)}
+                              disabled={saving === p.id}
+                              className={`px-3 py-1 text-xs font-semibold border transition-colors disabled:opacity-50 ${effectiveActive !== false ? 'border-red-200 text-red-600 hover:bg-red-50' : 'border-green-200 text-green-600 hover:bg-green-50'}`}
+                            >
+                              {effectiveActive !== false ? 'Pausar' : 'Activar'}
+                            </button>
+                            <button
+                              onClick={() => saveProduct(p)}
+                              disabled={saving === p.id || !hasPendingRow}
+                              className={`px-3 py-1 text-xs font-semibold border transition-colors disabled:opacity-40 ${hasPendingRow ? 'border-black bg-black text-white hover:bg-gray-800' : 'border-gray-200 text-gray-400 cursor-not-allowed'}`}
+                            >
+                              {saving === p.id ? '...' : 'Guardar'}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

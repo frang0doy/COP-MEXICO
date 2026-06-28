@@ -214,15 +214,10 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {me?.role === 'ADMIN' ? (
-            <div className="bg-white rounded-lg shadow-md p-6 mt-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">Pedidos (todos)</h2>
-              <p className="text-sm text-gray-600 mb-6">
-                Lista de pedidos de todos los clientes (solo admin).
-              </p>
-              <OrdersList mode="all" />
-            </div>
-          ) : null}
+          <div className="bg-white rounded-lg shadow-md p-6 mt-8 opacity-40 pointer-events-none select-none">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Pedidos</h2>
+            <p className="text-sm text-gray-500">Próximamente disponible.</p>
+          </div>
         </div>
 
         {/* Menú rápido */}
@@ -240,22 +235,6 @@ export default function ProfilePage() {
                   <span className="text-gray-700">Admin productos</span>
                 </Link>
               ) : null}
-              <Link
-                href="/pedidos"
-                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition"
-              >
-                <Package className="w-5 h-5 text-gray-400" />
-                <span className="text-gray-700">Mis Pedidos</span>
-              </Link>
-
-              <Link
-                href="/carrito"
-                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition"
-              >
-                <Package className="w-5 h-5 text-gray-400" />
-                <span className="text-gray-700">Carrito de Compras</span>
-              </Link>
-
               <button className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition text-left">
                 <Settings className="w-5 h-5 text-gray-400" />
                 <span className="text-gray-700">Configuración</span>

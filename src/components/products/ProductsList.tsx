@@ -234,20 +234,36 @@ export default function ProductsList() {
   }, [session])
 
   useEffect(() => {
-    const enriched: ProductDerived[] = PRODUCTS.map((p) => {
-      const usos = getProductUsos(p)
-      return {
-        ...p,
-        __applyAreas: computeApplyAreas(p),
-        __normName: normText(p.name ?? ''),
-        __normDescription: normText(p.description ?? ''),
-        __normUsos: normText(usos ?? ''),
-      }
-    })
-    const groupedProducts = toProductGroups(enriched)
-    setProducts(groupedProducts)
-    setFilteredProducts(groupedProducts)
-    setLoadError(null)
+    let cancelled = false
+    ;(async () => {
+      let source: Product[] = PRODUCTS
+      try {
+        const res = await fetch('/api/products', { cache: 'no-store' })
+        if (res.ok) {
+          const data = await res.json()
+          if (Array.isArray(data.products) && data.products.length > 0) {
+            const activeIds = new Set(data.products.filter((d: any) => d.isActive !== false).map((d: any) => d.id))
+            source = PRODUCTS.filter((p) => activeIds.has(p.id))
+          }
+        }
+      } catch {}
+      if (cancelled) return
+      const enriched: ProductDerived[] = source.map((p) => {
+        const usos = getProductUsos(p)
+        return {
+          ...p,
+          __applyAreas: computeApplyAreas(p),
+          __normName: normText(p.name ?? ''),
+          __normDescription: normText(p.description ?? ''),
+          __normUsos: normText(usos ?? ''),
+        }
+      })
+      const groupedProducts = toProductGroups(enriched)
+      setProducts(groupedProducts)
+      setFilteredProducts(groupedProducts)
+      setLoadError(null)
+    })()
+    return () => { cancelled = true }
   }, [])
 
   useEffect(() => {
