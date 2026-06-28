@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import { Menu, User } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { openCountryPicker } from '@/components/country/CountryPickerModal'
 
 
 export default function Navbar() {
@@ -297,16 +298,15 @@ export default function Navbar() {
                         </div>
 
                         <div className="border-t border-white/10 p-3">
-                          <a
-                            href={process.env.NEXT_PUBLIC_ARGENTINA_URL || 'https://cop-argentina.com'}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <button
+                            type="button"
+                            onClick={() => { openCountryPicker(); setIsUserMenuOpen(false) }}
                             className="group w-full flex items-center justify-between px-4 py-3 text-white/80 hover:text-orange-500 hover:bg-orange-500/10 transition-colors font-semibold"
                             role="menuitem"
                           >
-                            <span>Ir a Argentina</span>
-                            <span className="text-sm font-semibold text-white/60 group-hover:text-orange-500 transition-colors">🇦🇷</span>
-                          </a>
+                            <span>Cambiar país</span>
+                            <span className="text-sm font-semibold text-white/60 group-hover:text-orange-500 transition-colors">México</span>
+                          </button>
                           <button
                             onClick={() => {
                               signOut({ callbackUrl: '/' })
