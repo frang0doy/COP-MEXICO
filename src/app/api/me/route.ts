@@ -6,34 +6,27 @@ import { isAdminEmail } from '@/lib/admin'
 
 export const dynamic = 'force-dynamic'
 
+const USER_SELECT = {
+  id: true, email: true, name: true, role: true,
+  customerType: true, wholesaleStatus: true,
+  phone: true, cuit: true, address: true, city: true, state: true, zipCode: true,
+}
+
 export async function GET() {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      role: true,
-      customerType: true,
-      wholesaleStatus: true,
-    },
-  })
+  let user = await prisma.user.findUnique({ where: { id: session.user.id }, select: USER_SELECT })
+  if (!user) return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })
 
-  if (user?.email && isAdminEmail(user.email) && user.role !== 'ADMIN') {
-    const updated = await prisma.user.update({
+  if (isAdminEmail(user.email) && user.role !== 'ADMIN') {
+    user = await prisma.user.update({
       where: { id: user.id },
       data: { role: 'ADMIN' as any },
-      select: {
-        id: true, email: true, name: true, role: true,
-        customerType: true, wholesaleStatus: true,
-      },
+      select: USER_SELECT,
     })
-    return NextResponse.json({ user: updated }, { headers: { 'Cache-Control': 'no-store' } })
   }
 
   return NextResponse.json({ user }, { headers: { 'Cache-Control': 'no-store' } })
