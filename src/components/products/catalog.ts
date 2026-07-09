@@ -102,7 +102,6 @@ const TECHNICAL_SHEET_BY_ID: Record<number, string> = {
   36: '/fichas tecnicas/Plastibond.png',
   37: '/fichas tecnicas/Barniz_De_Inversion.png',
   38: '/fichas tecnicas/Cop_Antiderrapante.png',
-  39: '/fichas tecnicas/Mastercril.png',
   40: '/fichas tecnicas/Mastercril.png',
   41: '/fichas tecnicas/Acrilac 5000H.png',
   42: '/fichas tecnicas/Acriplus_7000H.png',
