@@ -63,22 +63,59 @@ export type TechnicalSummary = {
   caracteristicas?: string
 }
 
-function normalizeToSheetBase(input: string): string {
-  return input
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/\.[a-z0-9]+$/i, '')
-    .replace(/^[\/]/, '')
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '')
-    .replace(/_+/g, '_')
+const TECHNICAL_SHEET_BY_ID: Record<number, string> = {
+  1:  '/fichas tecnicas/base_floor.png',
+  2:  '/fichas tecnicas/microtex.png',
+  3:  '/fichas tecnicas/top_floor.png',
+  4:  '/fichas tecnicas/concreto_aparente.png',
+  5:  '/fichas tecnicas/chukum.png',
+  6:  '/fichas tecnicas/plastercop.png',
+  7:  '/fichas tecnicas/Estucop_fino.png',
+  8:  '/fichas tecnicas/Estucop_fino_flex.png',
+  9:  '/fichas tecnicas/Estucop_fino_acrilico.png',
+  10: '/fichas tecnicas/alisado.png',
+  11: '/fichas tecnicas/veneziano.png',
+  12: '/fichas tecnicas/Albercop.png',
+  13: '/fichas tecnicas/marmoltex.png',
+  14: '/fichas tecnicas/textucop.png',
+  15: '/fichas tecnicas/hormicop.png',
+  16: '/fichas tecnicas/REPELLO 3 EN 1.png',
+  17: '/fichas tecnicas/MASILLA FIBRADA.png',
+  18: '/fichas tecnicas/BASE COP FX.png',
+  19: '/fichas tecnicas/REPELLO TÉRMICO.png',
+  20: '/fichas tecnicas/REPELLO IMPERMEABLE.png',
+  21: '/fichas tecnicas/Impermeable de inmersión.png',
+  22: '/fichas tecnicas/Anti Salitre.png',
+  23: '/fichas tecnicas/COPELASTIC MONOCOMPONENTE.png',
+  24: '/fichas tecnicas/Impercop Acrílico.png',
+  25: '/fichas tecnicas/pega_ceramico.png',
+  26: '/fichas tecnicas/pega_porcelanato.png',
+  27: '/fichas tecnicas/pisosobrepiso_flex.png',
+  28: '/fichas tecnicas/pega_block.png',
+  29: '/fichas tecnicas/PEGA MARMOL.png',
+  30: '/fichas tecnicas/Junteador impermeable COP.png',
+  31: '/fichas tecnicas/Barniz_Sellador.png',
+  32: '/fichas tecnicas/Laca Poliuretanica.png',
+  33: '/fichas tecnicas/Cop_Silicon_Base_Agua.png',
+  34: '/fichas tecnicas/Cop_Silicon_Base_Solvente.png',
+  35: '/fichas tecnicas/Plasticop.png',
+  36: '/fichas tecnicas/Plastibond.png',
+  37: '/fichas tecnicas/Barniz_De_Inversion.png',
+  38: '/fichas tecnicas/Cop_Antiderrapante.png',
+  39: '/fichas tecnicas/Mastercril.png',
+  40: '/fichas tecnicas/Mastercril.png',
+  41: '/fichas tecnicas/Acrilac 5000H.png',
+  42: '/fichas tecnicas/Acriplus_7000H.png',
+  43: '/fichas tecnicas/Cop Esmalte.png',
+  44: '/fichas tecnicas/Traficop.png',
+  45: '/fichas tecnicas/Pintura Deportiva.png',
+  46: '/fichas tecnicas/Pintura Alberca.png',
+  47: '/fichas tecnicas/Redimix pasta.png',
+  48: '/fichas tecnicas/Redimix Seco.png',
 }
 
 function computeTechnicalSheet(product: Product): string | undefined {
-  const base = product.image
-    ? normalizeToSheetBase(product.image.split('/').pop() ?? '')
-    : normalizeToSheetBase(product.name)
-  return base ? '/documents/fichas-tecnicas/' + base + '.pdf' : undefined
+  return TECHNICAL_SHEET_BY_ID[product.id]
 }
 
 const TECHNICAL_SUMMARY_BY_ID: Record<number, TechnicalSummary> = {
