@@ -117,6 +117,55 @@ function computeTechnicalSheet(product: Product): string | undefined {
   return TECHNICAL_SHEET_BY_ID[product.id]
 }
 
+const IMAGE_BY_ID: Record<number, string> = {
+  1:  '/images/base_floor.png',
+  2:  '/images/microtex.png',
+  3:  '/images/top_floor.png',
+  4:  '/images/concreto_aparente.png',
+  5:  '/images/chukum.png',
+  7:  '/images/estucop_fino.png',
+  8:  '/images/estucop_fino_flex.png',
+  9:  '/images/estucop_fino_acrilico.png',
+  10: '/images/alisado.png',
+  11: '/images/veneziano.png',
+  12: '/images/albercop.png',
+  13: '/images/marmoltex.png',
+  14: '/images/textucop.png',
+  15: '/images/hormicop.png',
+  16: '/images/repello_3en1.png',
+  17: '/images/masilla_fiebrada.png',
+  18: '/images/base_copfx.png',
+  19: '/images/repello_termico.png',
+  20: '/images/repello_impermeable.png',
+  21: '/images/impermeable_de_inmersion_1.png',
+  22: '/images/anti_salitre_1.png',
+  23: '/images/copelastic_monocomponente.png',
+  24: '/images/impercop_acrilico.png',
+  25: '/images/pega_ceramico.png',
+  26: '/images/pega_porcelanato_1.png',
+  27: '/images/piso_sobre_piso_flex.png',
+  28: '/images/pega_block_1.png',
+  29: '/images/pega_marmol_1.png',
+  30: '/images/juntador_impermeable_cop.png',
+  31: '/images/barniz_sellador.png',
+  32: '/images/laca_poliuretanica.png',
+  33: '/images/cop_silicon_base_agua.png',
+  34: '/images/cop_silicon_base_solvente.png',
+  35: '/images/plasticop.png',
+  36: '/images/plastibond.png',
+  37: '/images/barniz_de_impresion (2).png',
+  38: '/images/antiderrapante_cop.png',
+  40: '/images/mastercril.png',
+  41: '/images/acrilplus_5000.png',
+  42: '/images/acrilplus_7000.png',
+  43: '/images/cop_esmalte.png',
+  44: '/images/traficop.png',
+  45: '/images/pintura_deportiva.png',
+  46: '/images/pintura_albercas.png',
+  47: '/images/rendimix_pasta.png',
+  48: '/images/rendimix_seco.png',
+}
+
 const TECHNICAL_SUMMARY_BY_ID: Record<number, TechnicalSummary> = {
   1: {
     rendimiento: "5 a 6 m2 a 3 mm de espesor.  Los rendimientos son en base a nuestra experiencia y son relativos, dependiendo del modo de aplicación y las condiciones del sustrato",
@@ -1036,6 +1085,7 @@ export const PRODUCTS: Product[] = RAW_PRODUCTS.map((p) => {
   const product = { ...p } as Product
   if (summary) product.technicalSummary = summary
   product.technicalSheet = computeTechnicalSheet(product)
+  if (IMAGE_BY_ID[p.id]) product.image = IMAGE_BY_ID[p.id]
   return product
 })
 
