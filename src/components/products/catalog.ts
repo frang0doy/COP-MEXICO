@@ -123,6 +123,7 @@ const IMAGE_BY_ID: Record<number, string> = {
   3:  '/images/top_floor.png',
   4:  '/images/concreto_aparente.png',
   5:  '/images/chukum.png',
+  6:  '/images/plastercop.png',
   7:  '/images/estucop_fino.png',
   8:  '/images/estucop_fino_flex.png',
   9:  '/images/estucop_fino_acrilico.png',
