@@ -67,7 +67,7 @@ export default function ProductCard({ product, isWholesaleViewer }: ProductCardP
 
           {/* Información del producto */}
           <div className="p-3 md:p-4 flex-1 flex flex-col">
-            <h3 className="text-sm sm:text-base md:text-lg font-semibold text-black line-clamp-2">
+            <h3 className="text-sm sm:text-base md:text-lg font-semibold text-black line-clamp-2 uppercase">
               <span className="relative inline-block">
                 {product.name}
                 {/* Subrayado deslizante */}
