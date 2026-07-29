@@ -19,10 +19,10 @@ const featuredProducts = [
   },
   {
     id: 11,
-    name: 'Veneziano',
-    category: 'ESTUCOS',
+    name: 'Repello Térmico',
+    category: 'REPELLOS',
     price: 0,
-    image: '/images/veneziano.png',
+    image: '/images/repello_termico.png',
   },
   {
     id: 24,

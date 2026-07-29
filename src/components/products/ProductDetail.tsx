@@ -6,8 +6,6 @@ import {
   Download,
   Calculator,
   X,
-  ImageIcon,
-  Palette,
 } from 'lucide-react'
 import Link from 'next/link'
 import {
@@ -207,36 +205,9 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                     </div>
                   ) : null}
 
-                  {hasColorProductToggle ? (
+                  {false ? (
                     <div className="mt-4 w-full max-w-[520px] sm:max-w-[600px] lg:max-w-[680px] mx-auto">
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">
-                        Cambiar vista
-                      </p>
                       <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                        <button
-                          type="button"
-                          onClick={() => setGalleryMode('product')}
-                          className={[
-                            'flex items-center gap-3 border p-2 text-left transition',
-                            galleryMode === 'product'
-                              ? 'border-orange-500 bg-white ring-1 ring-orange-500/30'
-                              : 'border-gray-200 bg-white hover:border-gray-400',
-                          ].join(' ')}
-                        >
-                          <span className="relative h-14 w-14 shrink-0 overflow-hidden bg-white border border-gray-100">
-                            {productImageSrc ? (
-                              <img src={productImageSrc} alt="" className="h-full w-full object-cover" />
-                            ) : (
-                              <span className="flex h-full w-full items-center justify-center text-gray-300">
-                                <ImageIcon className="h-6 w-6" />
-                              </span>
-                            )}
-                          </span>
-                          <span className="min-w-0">
-                            <span className="block text-xs font-semibold text-black">Producto</span>
-                            <span className="block text-[11px] text-gray-500">Envase / presentación</span>
-                          </span>
-                        </button>
                         <button
                           type="button"
                           onClick={() => setGalleryMode('color')}
@@ -407,14 +378,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                     </ul>
 
                     <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                      {(variantLabels.length > 0 || technicalSummary.colores) && (
-                        <div className="border border-gray-200 p-4">
-                          <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase">Colores del producto</p>
-                          <p className="text-black mt-2">
-                            {variantLabels.length > 0 ? formatSpanishList(variantLabels) : technicalSummary.colores}
-                          </p>
-                        </div>
-                      )}
                       {technicalSummary.usos && (
                         <div className="border border-gray-200 p-4 sm:col-span-2">
                           <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase">Usos</p>
