@@ -393,7 +393,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
             {/* CTA contacto */}
             <div className="mt-2 border border-gray-200 bg-gray-50 p-5">
               <p className="text-sm font-semibold text-black mb-1">¿Necesitás más información?</p>
-              <p className="text-sm text-gray-600 mb-3">Contactanos para asesoramiento técnico o solicitar este producto.</p>
+              <p className="text-sm text-gray-600 mb-3">Descargá la ficha técnica o contactanos para asesoramiento técnico o solicitar este producto.</p>
               <Link
                 href="/contacto"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white text-sm font-semibold hover:bg-orange-500 transition-colors"
