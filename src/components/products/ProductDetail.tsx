@@ -205,37 +205,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                     </div>
                   ) : null}
 
-                  {false ? (
-                    <div className="mt-4 w-full max-w-[520px] sm:max-w-[600px] lg:max-w-[680px] mx-auto">
-                      <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                        <button
-                          type="button"
-                          onClick={() => setGalleryMode('color')}
-                          className={[
-                            'flex items-center gap-3 border p-2 text-left transition',
-                            galleryMode === 'color'
-                              ? 'border-orange-500 bg-white ring-1 ring-orange-500/30'
-                              : 'border-gray-200 bg-white hover:border-gray-400',
-                          ].join(' ')}
-                        >
-                          <span className="relative h-14 w-14 shrink-0 overflow-hidden bg-gray-100 border border-gray-100">
-                            {colorSampleSrc ? (
-                              <img src={colorSampleSrc} alt="" className="h-full w-full object-cover" />
-                            ) : null}
-                          </span>
-                          <span className="min-w-0">
-                            <span className="block text-xs font-semibold text-black">Muestra del color</span>
-                            <span className="block text-[11px] text-gray-500 truncate">{variantLabelForGallery}</span>
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  ) : colorSampleSrc && !productImageSrc ? (
-                    <p className="mt-3 flex items-center justify-center gap-2 text-xs text-gray-600">
-                      <Palette className="h-4 w-4 shrink-0 text-orange-600" />
-                      Vista: muestra del color ({variantLabelForGallery})
-                    </p>
-                  ) : null}
                 </div>
               ) : (
                 <span className="text-gray-400">Imagen del Producto</span>
