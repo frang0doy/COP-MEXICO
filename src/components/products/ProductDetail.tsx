@@ -297,23 +297,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
               </div>
             </div>
 
-            {/* Variantes */}
-            {variants.length > 1 ? (
-              <div className="mb-5">
-                <select
-                  aria-label="Elegir color u opción"
-                  value={selectedVariantId ?? selectedProduct.id}
-                  onChange={(e) => setSelectedVariantId(Number(e.target.value))}
-                  className="w-full sm:max-w-sm px-3 py-2 border border-gray-200 bg-white focus:border-black transition-colors"
-                >
-                  {variants.map((variant) => (
-                    <option key={variant.id} value={variant.id}>
-                      {detectVariantLabel(variant.name, detectGroupBaseName(variant.name))}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ) : null}
+            {/* Variantes — oculto hasta tener imágenes de cada color */}
 
             {!productHidesDetailDescription(selectedProduct.id) ? (
               <div className="mb-5 sm:mb-6">
