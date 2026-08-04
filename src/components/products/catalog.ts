@@ -919,7 +919,7 @@ const RAW_PRODUCTS = [
   },
   {
     id: 31,
-    name: "Barniz sellador",
+    name: "LACA SOLVENTE",
     description: "Barniz base solvente que forma una pelicula brillosa o mate para proteger superficies  exteriores contra la abrasión y rayos UV",
     price: 0,
     category: 'selladores_barnices' as CategoryKey,
@@ -928,7 +928,7 @@ const RAW_PRODUCTS = [
   },
   {
     id: 32,
-    name: "Laca Poliuretánica",
+    name: "BARNIZCOP POLIURETANICO",
     description: "Barniz poliuretánico mate o brilloso de alta resistencia que otorga gran protección ideal para el tránsito liviano.",
     price: 0,
     category: 'selladores_barnices' as CategoryKey,
@@ -973,7 +973,7 @@ const RAW_PRODUCTS = [
   },
   {
     id: 37,
-    name: "Barniz de inmersión",
+    name: "SELLACOP INMERSION",
     description: "Sellador a base de resinas altamente hidrofugas para porteger revestimientos en inmersión o en constante contacto con el agua.",
     price: 0,
     category: 'selladores_barnices' as CategoryKey,
