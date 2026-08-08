@@ -153,6 +153,7 @@ const IMAGE_BY_ID: Record<number, string> = {
   36: '/images/plastibond.png',
   37: '/images/SELLACOP INMERSION.png',
   38: '/images/antiderrapante_cop.png',
+  39: '/images/INTERCRIL.png',
   40: '/images/mastercril.png',
   41: '/images/acrilplus_5000.png',
   42: '/images/acrilplus_7000.png',
