@@ -67,7 +67,7 @@ export default function ProductCard({ product, isWholesaleViewer }: ProductCardP
 
           {/* Información del producto */}
           <div className="p-3 md:p-4 flex-1 flex flex-col">
-            <h3 className="text-sm sm:text-base md:text-lg font-semibold text-black line-clamp-2 uppercase">
+            <h3 className="text-sm sm:text-base md:text-lg font-semibold text-black line-clamp-2 uppercase leading-tight">
               <span className="relative inline-block">
                 {product.name}
                 {/* Subrayado deslizante */}
@@ -76,10 +76,7 @@ export default function ProductCard({ product, isWholesaleViewer }: ProductCardP
             </h3>
 
             <div className="mt-auto">
-              <div className="flex items-center justify-between gap-3 mt-3">
-                <span className="text-lg sm:text-xl md:text-2xl font-bold text-black">
-                  ${displayPrice.toLocaleString('es-MX')}
-                </span>
+              <div className="flex items-center justify-end mt-3">
                 <Link
                   href={`/productos/${product.id}`}
                   className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-200 bg-white text-xs sm:text-sm font-semibold transition-transform duration-200 hover:scale-[1.03] hover:border-orange-500"

@@ -146,7 +146,7 @@ const IMAGE_BY_ID: Record<number, string> = {
   29: '/images/pega_marmol_1.png',
   30: '/images/juntador_impermeable_cop.png',
   31: '/images/LACA SOLVENTE.png',
-  32: '/images/BARNIZCOP POLIURETÁNICO.png',
+  32: '/images/barnizcop_poliuretanico.png',
   33: '/images/cop_silicon_base_agua.png',
   34: '/images/cop_silicon_base_solvente.png',
   35: '/images/plasticop.png',
