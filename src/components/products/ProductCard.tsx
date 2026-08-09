@@ -67,11 +67,11 @@ export default function ProductCard({ product, isWholesaleViewer }: ProductCardP
 
           {/* Información del producto */}
           <div className="p-3 md:p-4 flex-1 flex flex-col">
-            <h3 className="text-sm sm:text-base md:text-lg font-semibold text-black line-clamp-2 uppercase leading-tight">
+            <h3 className="text-sm sm:text-base md:text-lg font-semibold text-black uppercase" style={{ lineHeight: '1.15', height: '2.4em', overflow: 'hidden' }}>
               <span className="relative inline-block">
                 {product.name}
                 {/* Subrayado deslizante */}
-                <span className="pointer-events-none absolute left-0 -bottom-1 h-[2px] w-full origin-left scale-x-0 bg-black transition-transform duration-300 group-hover:scale-x-100" />
+                <span className="pointer-events-none absolute left-0 -bottom-1 h-[2px] w-full origin-left scale-x-0 bg-orange-500 transition-transform duration-300 group-hover:scale-x-100" />
               </span>
             </h3>
 

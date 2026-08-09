@@ -19,7 +19,7 @@ import {
   type Product,
 } from './catalog'
 import ConsumptionCalculatorModal from './ConsumptionCalculatorModal'
-import { detectGroupBaseName, detectVariantLabel, normText } from './variantGrouping'
+import { detectGroupBaseName, detectVariantLabel } from './variantGrouping'
 import { getColorSamplePath } from './productColorSamples'
 
 interface ProductDetailProps {
@@ -32,7 +32,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showCalculator, setShowCalculator] = useState(false)
-  const [galleryMode, setGalleryMode] = useState<'product' | 'color'>('product')
+  const [galleryMode] = useState<'product' | 'color'>('product')
   const [productPhotoIndex, setProductPhotoIndex] = useState(0)
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
 
@@ -53,7 +53,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
   useEffect(() => {
     setProductPhotoIndex(0)
-    setGalleryMode('product')
   }, [selectedVariantId])
 
   useEffect(() => {
@@ -106,35 +105,12 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const productImageSrc = selectedProduct.image ?? ''
   const rawGallery = getGalleryImagePathsById(selectedProduct.id) ?? []
   const uniqueProductPhotos = Array.from(new Set([productImageSrc, ...rawGallery].filter(Boolean)))
-  const hasMultiProductPhotos = uniqueProductPhotos.length > 1
   const primaryProductSrc =
     uniqueProductPhotos[Math.min(productPhotoIndex, uniqueProductPhotos.length - 1)] ?? productImageSrc
-  const hasColorProductToggle = Boolean(colorSampleSrc && productImageSrc)
   const mainGallerySrc =
     colorSampleSrc && (!productImageSrc || galleryMode === 'color')
       ? colorSampleSrc
       : primaryProductSrc || colorSampleSrc
-
-  const variantLabels =
-    variants.length > 1
-      ? Array.from(
-          new Set(
-            variants.map((v) => detectVariantLabel(v.name, detectGroupBaseName(v.name))).filter(Boolean)
-          )
-        )
-      : []
-
-  function formatSpanishList(items: string[]): string {
-    const clean = items.map((s) => s.trim()).filter(Boolean)
-    if (clean.length === 0) return ''
-    if (clean.length === 1) return clean[0]!
-    if (clean.length === 2) return `${clean[0]} y ${clean[1]}`
-    return `${clean.slice(0, -1).join(', ')} y ${clean[clean.length - 1]}`
-  }
-
-  const titleParts = selectedProduct.name.trim().split(/\s+/).filter(Boolean)
-  const titleFirst = titleParts[0] ?? ''
-  const titleRest = titleParts.slice(1).join(' ')
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -151,211 +127,138 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
           <div className={['h-1 w-28', theme.accent].join(' ')} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2">
+        {/* Fila superior: imagen | info */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-start">
           {/* Imagen */}
-          <div className="bg-gray-50 p-4 sm:p-10 flex flex-col items-center justify-center">
-            <div className="w-full flex flex-col items-center justify-center gap-4">
-              {mainGallerySrc ? (
-                <div className="w-full">
-                  <button
-                    type="button"
-                    onClick={() => setLightboxSrc(mainGallerySrc)}
-                    className="group relative w-full cursor-zoom-in rounded-sm border border-transparent p-0 text-left transition hover:border-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
-                    aria-label="Ver imagen ampliada"
-                  >
-                    <img
-                      src={mainGallerySrc}
-                      alt={
-                        hasColorProductToggle && galleryMode === 'color'
-                          ? `Muestra del color — ${variantLabelForGallery}`
-                          : selectedProduct.name
-                      }
-                      className="block w-full max-w-[520px] sm:max-w-[600px] lg:max-w-[680px] max-h-[min(70vh,640px)] sm:max-h-[min(75vh,680px)] object-contain mx-auto"
-                    />
-                    <span className="pointer-events-none absolute bottom-3 right-3 rounded bg-black/55 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-white opacity-0 transition group-hover:opacity-100 sm:text-xs">
-                      Clic para ampliar
-                    </span>
-                  </button>
-
-                  {hasMultiProductPhotos && galleryMode === 'product' ? (
-                    <div className="mt-4 w-full max-w-[520px] sm:max-w-[600px] lg:max-w-[680px] mx-auto">
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">
-                        Más fotos del producto
-                      </p>
-                      <div className="flex flex-wrap gap-2 sm:gap-3">
-                        {uniqueProductPhotos.map((src, i) => (
-                          <button
-                            key={`${src}-${i}`}
-                            type="button"
-                            onClick={() => setProductPhotoIndex(i)}
-                            className={[
-                              'flex items-center gap-2 border p-1.5 transition sm:p-2',
-                              productPhotoIndex === i
-                                ? 'border-orange-500 bg-white ring-1 ring-orange-500/30'
-                                : 'border-gray-200 bg-white hover:border-gray-400',
-                            ].join(' ')}
-                            aria-label={i === 0 ? 'Vista principal' : `Foto ${i + 1}`}
-                          >
-                            <span className="relative h-14 w-14 shrink-0 overflow-hidden bg-white border border-gray-100">
-                              <img src={src} alt="" className="h-full w-full object-cover" />
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
-
-                </div>
-              ) : (
-                <span className="text-gray-400">Imagen del Producto</span>
-              )}
-            </div>
+          <div className="bg-gray-50 p-6 sm:p-10 flex items-start justify-center">
+            {mainGallerySrc ? (
+              <button
+                type="button"
+                onClick={() => setLightboxSrc(mainGallerySrc)}
+                className="group relative w-full cursor-zoom-in rounded-sm border border-transparent p-0 text-left transition hover:border-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+                aria-label="Ver imagen ampliada"
+              >
+                <img
+                  src={mainGallerySrc}
+                  alt={selectedProduct.name}
+                  className="block w-full max-w-[480px] max-h-[520px] object-contain mx-auto"
+                />
+                <span className="pointer-events-none absolute bottom-3 right-3 rounded bg-black/55 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-white opacity-0 transition group-hover:opacity-100 sm:text-xs">
+                  Clic para ampliar
+                </span>
+              </button>
+            ) : (
+              <span className="text-gray-400">Imagen del Producto</span>
+            )}
           </div>
 
-          {/* Info */}
-          <div className="border-t border-gray-200 lg:border-t-0 lg:border-l p-4 sm:p-10">
+          {/* Info superior: título, botones, descripción, observaciones, presentación, características */}
+          <div className="border-t border-gray-200 lg:border-t-0 lg:border-l p-5 sm:p-8">
             <span className="text-xs text-gray-600 font-medium tracking-wider uppercase flex items-center gap-2">
               <span className={['w-2 h-2', theme.accent].join(' ')} />
               {categoryLabel}
             </span>
 
-            <div className="mt-2 mb-6">
-              <div className="flex flex-col sm:flex-row sm:items-start gap-3">
-                <h1 className="text-2xl sm:text-4xl font-bold text-black tracking-tight sm:flex-1 min-w-0 leading-tight break-words">
-                  {titleRest ? (
-                    <>
-                      <span className="block">{titleFirst}</span>
-                      <span className="block">{titleRest}</span>
-                    </>
-                  ) : (
-                    titleFirst
-                  )}
-                </h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black tracking-tight leading-tight break-words mt-2 mb-4">
+              {selectedProduct.name}
+            </h1>
 
-                <div className="flex flex-col gap-2 w-full max-w-[240px] mx-auto sm:mx-0 sm:max-w-none sm:w-[260px] shrink-0">
-                  {selectedProduct.technicalSheet ? (
-                    <a
-                      href={selectedProduct.technicalSheet}
-                      download
-                      className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 border border-gray-200 bg-white text-xs sm:text-sm font-semibold hover:border-orange-500 transition-colors"
-                      aria-label="Descargar ficha técnica"
-                    >
-                      <Download className="w-4 h-4" />
-                      Descargar ficha técnica
-                    </a>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled
-                      className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 border border-gray-200 bg-gray-50 text-xs sm:text-sm font-semibold text-gray-400 cursor-not-allowed"
-                    >
-                      <Download className="w-4 h-4" />
-                      Ficha técnica próximamente
-                    </button>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => setShowCalculator(true)}
-                    className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 border border-gray-200 bg-white text-xs sm:text-sm font-semibold hover:border-orange-500 hover:bg-orange-50 transition-colors"
-                  >
-                    <Calculator className="w-4 h-4" />
-                    Calculadora de consumo
-                  </button>
-                </div>
-              </div>
+            <div className="flex flex-col gap-2 mb-5">
+              {selectedProduct.technicalSheet ? (
+                <a
+                  href={selectedProduct.technicalSheet}
+                  download
+                  className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 border border-gray-200 bg-white text-xs sm:text-sm font-semibold hover:border-orange-500 transition-colors"
+                  aria-label="Descargar ficha técnica"
+                >
+                  <Download className="w-4 h-4" />
+                  Descargar ficha técnica
+                </a>
+              ) : (
+                <button type="button" disabled className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 border border-gray-200 bg-gray-50 text-xs sm:text-sm font-semibold text-gray-400 cursor-not-allowed">
+                  <Download className="w-4 h-4" />
+                  Ficha técnica próximamente
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setShowCalculator(true)}
+                className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 border border-gray-200 bg-white text-xs sm:text-sm font-semibold hover:border-orange-500 hover:bg-orange-50 transition-colors"
+              >
+                <Calculator className="w-4 h-4" />
+                Calculadora de consumo
+              </button>
             </div>
 
-            {/* Variantes — oculto hasta tener imágenes de cada color */}
-
-            {!productHidesDetailDescription(selectedProduct.id) ? (
-              <div className="mb-5 sm:mb-6">
-                <p className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-line">
-                  {selectedProduct.description}
-                </p>
-              </div>
-            ) : null}
-
-            {/* Infografía técnica */}
-            {technicalSummary && (
-              <section className="mb-6">
-                <div className="bg-white border border-gray-200 overflow-hidden ring-1 ring-black/5">
-                  <div className="h-1 w-full bg-gray-100">
-                    <div className={['h-1 w-28', theme.accent].join(' ')} />
-                  </div>
-                  <div className="p-5">
-                    <div>
-                      <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase">Infografía</p>
-                      <p className="text-lg font-semibold text-black mt-1">Datos clave del producto</p>
-                    </div>
-                    {technicalSummary.observaciones && (
-                      <div className="mt-4 border border-gray-200 bg-gray-50 p-4">
-                        <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase mb-2">Observaciones</p>
-                        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{technicalSummary.observaciones}</p>
-                      </div>
-                    )}
-
-                    {technicalSummary.presentacion && (
-                      <div className="mt-5 border border-gray-200 bg-gray-50 p-4">
-                        <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase">Presentación</p>
-                        <p className="text-2xl sm:text-3xl font-bold text-black mt-1">{technicalSummary.presentacion}</p>
-                      </div>
-                    )}
-
-                    {technicalSummary.caracteristicas && (
-                      <div className="mt-5 border border-gray-200 p-4">
-                        <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase">Características</p>
-                        <p className="text-black mt-2 leading-relaxed">{technicalSummary.caracteristicas}</p>
-                      </div>
-                    )}
-
-                    <ul className="mt-5 space-y-2 text-sm text-gray-700">
-                      {technicalSummary.rendimiento && (
-                        <li className="flex gap-2">
-                          <span className={['mt-2 w-2 h-2 shrink-0', theme.accent].join(' ')} />
-                          <span><span className="font-semibold text-black">Rendimiento:</span> {technicalSummary.rendimiento}</span>
-                        </li>
-                      )}
-                      {technicalSummary.conservacion && (
-                        <li className="flex gap-2">
-                          <span className={['mt-2 w-2 h-2 shrink-0', theme.accent].join(' ')} />
-                          <span><span className="font-semibold text-black">Conservación:</span> {technicalSummary.conservacion}</span>
-                        </li>
-                      )}
-                      {technicalSummary.almacenaje && (
-                        <li className="flex gap-2">
-                          <span className={['mt-2 w-2 h-2 shrink-0', theme.accent].join(' ')} />
-                          <span><span className="font-semibold text-black">Almacenaje:</span> {technicalSummary.almacenaje}</span>
-                        </li>
-                      )}
-                    </ul>
-
-                    <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                      {technicalSummary.usos && (
-                        <div className="border border-gray-200 p-4 sm:col-span-2">
-                          <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase">Usos</p>
-                          <p className="text-black mt-2 leading-relaxed">{technicalSummary.usos}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </section>
+            {!productHidesDetailDescription(selectedProduct.id) && (
+              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line mb-5">
+                {selectedProduct.description}
+              </p>
             )}
 
-            {/* CTA contacto */}
-            <div className="mt-2 border border-gray-200 bg-gray-50 p-5">
+            {technicalSummary?.observaciones && (
+              <div className="mb-4 border border-gray-200 bg-gray-50 p-4">
+                <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase mb-2">Observaciones</p>
+                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{technicalSummary.observaciones}</p>
+              </div>
+            )}
+
+            {technicalSummary?.presentacion && (
+              <div className="mb-4 border border-gray-200 bg-gray-50 p-4">
+                <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase">Presentación</p>
+                <p className="text-2xl sm:text-3xl font-bold text-black mt-1">{technicalSummary.presentacion}</p>
+              </div>
+            )}
+
+            {technicalSummary?.caracteristicas && (
+              <div className="border border-gray-200 p-4">
+                <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase">Características</p>
+                <p className="text-black mt-2 leading-relaxed text-sm">{technicalSummary.caracteristicas}</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Fila inferior: ancho completo */}
+        {technicalSummary && (
+          <div className="border-t border-gray-200 p-5 sm:p-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm mb-4">
+              {technicalSummary.rendimiento && (
+                <div className="border border-gray-200 p-4">
+                  <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase mb-1">Rendimiento</p>
+                  <p className="text-black leading-relaxed">{technicalSummary.rendimiento}</p>
+                </div>
+              )}
+              {technicalSummary.conservacion && (
+                <div className="border border-gray-200 p-4">
+                  <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase mb-1">Conservación</p>
+                  <p className="text-black leading-relaxed">{technicalSummary.conservacion}</p>
+                </div>
+              )}
+              {technicalSummary.almacenaje && (
+                <div className="border border-gray-200 p-4">
+                  <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase mb-1">Almacenaje</p>
+                  <p className="text-black leading-relaxed">{technicalSummary.almacenaje}</p>
+                </div>
+              )}
+            </div>
+
+            {technicalSummary.usos && (
+              <div className="border border-gray-200 p-4 mb-4 text-sm">
+                <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase">Usos</p>
+                <p className="text-black mt-2 leading-relaxed">{technicalSummary.usos}</p>
+              </div>
+            )}
+
+            <div className="border border-gray-200 bg-gray-50 p-5">
               <p className="text-sm font-semibold text-black mb-1">¿Necesitás más información?</p>
               <p className="text-sm text-gray-600 mb-3">Descargá la ficha técnica o contactanos para asesoramiento técnico o solicitar este producto.</p>
-              <Link
-                href="/contacto"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white text-sm font-semibold hover:bg-orange-500 transition-colors"
-              >
+              <Link href="/contacto" className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white text-sm font-semibold hover:bg-orange-500 transition-colors">
                 Contactar
               </Link>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       <ConsumptionCalculatorModal
