@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import ProductCard from './ProductCard'
 import { ChevronDown, Search, X } from 'lucide-react'
@@ -198,13 +198,25 @@ function toProductGroups(products: ProductDerived[]): ProductGroup[] {
   return out.sort((a, b) => a.id - b.id)
 }
 
+function buildInitialGroups(): ProductGroup[] {
+  const enriched: ProductDerived[] = PRODUCTS.map((p) => ({
+    ...p,
+    __applyAreas: computeApplyAreas(p),
+    __normName: normText(p.name ?? ''),
+    __normDescription: normText(p.description ?? ''),
+    __normUsos: normText(getProductUsos(p)),
+  }))
+  return toProductGroups(enriched)
+}
+
 export default function ProductsList() {
   const { data: session } = useSession()
   const [isWholesaleViewer, setIsWholesaleViewer] = useState(false)
 
-  const [products, setProducts] = useState<ProductGroup[]>([])
+  const initialGroups = useMemo(buildInitialGroups, [])
+  const [products, setProducts] = useState<ProductGroup[]>(initialGroups)
   const totalProducts = products.length
-  const [filteredProducts, setFilteredProducts] = useState<ProductGroup[]>([])
+  const [filteredProducts, setFilteredProducts] = useState<ProductGroup[]>(initialGroups)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<'Todos' | CategoryKey>('Todos')
   const [selectedApplyArea, setSelectedApplyArea] = useState<'Todos' | ApplyAreaKey>('Todos')
