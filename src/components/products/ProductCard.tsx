@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
@@ -53,7 +54,14 @@ export default function ProductCard({ product, isWholesaleViewer }: ProductCardP
           <div className="relative h-40 sm:h-56 md:h-64 bg-gray-100 overflow-hidden">
             <div className="absolute inset-0 flex items-center justify-center text-gray-400">
               {product.image ? (
-                <img src={product.image} alt={product.name} className="w-full h-full object-contain" />
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  loading="lazy"
+                />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-100" />
               )}

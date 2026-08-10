@@ -179,7 +179,7 @@ const TECHNICAL_SUMMARY_BY_ID: Record<number, TechnicalSummary> = {
   2: {
     rendimiento: "25 m2 por Balde de 32 kg a 3 mm de espesor",
     almacenaje: "Envase original herméticamente cerrado.",
-    presentacion: "Balde de 37 kg",
+    presentacion: "Balde de 32 kg",
     conservacion: "12 meses a partir de la fecha de fabricación.",
     colores: "Mercurio, Plomo, Marfil y chukum",
     usos: "Aplicación sobre BASE FLOOR, BASECOP, repello 3 en 1 COP, masilla COP, placas de cartón, yeso, fibrocemento previamente sellado con PLASTIBOND",

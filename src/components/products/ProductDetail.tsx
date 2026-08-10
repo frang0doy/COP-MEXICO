@@ -8,6 +8,7 @@ import {
   X,
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   CATEGORY_LABEL,
   CATEGORY_THEME,
@@ -138,10 +139,13 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                 className="group relative w-full cursor-zoom-in rounded-sm border border-transparent p-0 text-left transition hover:border-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
                 aria-label="Ver imagen ampliada"
               >
-                <img
+                <Image
                   src={mainGallerySrc}
                   alt={selectedProduct.name}
+                  width={480}
+                  height={520}
                   className="block w-full max-w-[480px] max-h-[520px] object-contain mx-auto"
+                  priority
                 />
                 <span className="pointer-events-none absolute bottom-3 right-3 rounded bg-black/55 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-white opacity-0 transition group-hover:opacity-100 sm:text-xs">
                   Clic para ampliar
