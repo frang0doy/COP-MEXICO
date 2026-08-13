@@ -68,7 +68,7 @@ export default function CTA() {
           <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-auto">
               <a
-                href="/fichas tecnicas/catalogo_cop2026_mexico.pdf"
+                href="/fichas tecnicas/Catálogo COP RECUBRIMIENTOS 2026 nuevo.pdf"
                 download
                 className="group bg-orange-500 text-white px-6 md:px-10 py-3 md:py-4 text-sm md:text-base font-medium border border-orange-500 hover:bg-orange-600 hover:border-orange-600 transition-colors duration-300 inline-flex items-center justify-center space-x-3 w-auto"
               >
