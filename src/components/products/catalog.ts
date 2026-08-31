@@ -108,6 +108,9 @@ const TECHNICAL_SHEET_BY_ID: Record<number, string> = {
   45: '/fichas tecnicas/PINTURA DEPORTIVA.pdf',
   46: '/fichas tecnicas/PINTURA ALBERCAS.pdf',
   47: '/fichas tecnicas/REDIMIX PASTA.pdf',
+  18: '/fichas tecnicas/Base_Cop_Flex_Nuevo.pdf',
+  20: '/fichas tecnicas/Repello_impermeable_nuevo.pdf',
+  48: '/fichas tecnicas/Redimix_en polvo_nuevo.pdf',
 }
 
 function computeTechnicalSheet(product: Product): string | undefined {
